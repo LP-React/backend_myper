@@ -36,6 +36,7 @@ namespace backend_myper.Context
                 tb.Property(col => col.Nombres).IsRequired().HasMaxLength(80);
                 tb.Property(col => col.Apellidos).IsRequired().HasMaxLength(80);
                 tb.HasOne(col => col.TipoDocumento).WithMany(t => t.Trabajadores).HasForeignKey(col => col.TipoDocumentoId);
+                tb.Property(col => col.NumeroDocumento).IsRequired().HasMaxLength(20);
                 tb.ToTable("Trabajador");
             });
         }

@@ -7,7 +7,7 @@
         public string Apellidos { get; set; }
         public int TipoDocumentoId { get; set; }
         public TipoDocumento TipoDocumento { get; set; }
-        public int NumeroDocumento { get; set; }
+        public string NumeroDocumento { get; set; }
         public DateTime FechaNacimiento { get; set; }
         public string Sexo { get; set; }
         public string FotoUrl { get; set; }
