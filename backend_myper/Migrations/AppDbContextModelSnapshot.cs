@@ -58,6 +58,8 @@ namespace backend_myper.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrabajadorId"));
+
                     b.Property<string>("Apellidos")
                         .IsRequired()
                         .HasMaxLength(80)
@@ -89,7 +91,12 @@ namespace backend_myper.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TipoDocumentoId")
+                        .HasColumnType("int");
+
                     b.HasKey("TrabajadorId");
+
+                    b.HasIndex("TipoDocumentoId");
 
                     b.ToTable("Trabajador", (string)null);
                 });
@@ -98,7 +105,7 @@ namespace backend_myper.Migrations
                 {
                     b.HasOne("backend_myper.Entities.TipoDocumento", "TipoDocumento")
                         .WithMany("Trabajadores")
-                        .HasForeignKey("TrabajadorId")
+                        .HasForeignKey("TipoDocumentoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
