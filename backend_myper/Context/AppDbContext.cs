@@ -1,4 +1,5 @@
-﻿using backend_myper.Entities;
+﻿using backend_myper.DTOs.Trabajador;
+using backend_myper.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -14,9 +15,12 @@ namespace backend_myper.Context
 
         public DbSet<Trabajador> Trabajador { get; set; }
         public DbSet<TipoDocumento> TipoDocumento { get; set; }
+        public DbSet<TrabajadorSPDTO> TrabajadoresSP { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<TrabajadorSPDTO>().HasNoKey();
+
             modelBuilder.Entity<TipoDocumento>(tb =>
             {
                 tb.HasKey(col => col.TipoDocumentoId);

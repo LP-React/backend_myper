@@ -19,12 +19,12 @@ namespace backend_myper.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<TipoDocumentoDTO>>> Get()
+        public async Task<ActionResult<List<TipoDocumentoReadDTO>>> Get()
         {
-            var listaDTO = new List<TipoDocumentoDTO>();
+            var listaDTO = new List<TipoDocumentoReadDTO>();
 
             foreach(var item in await _context.TipoDocumento.ToListAsync()){
-                listaDTO.Add(new TipoDocumentoDTO
+                listaDTO.Add(new TipoDocumentoReadDTO
                 {
                     TipoDocumentoId = item.TipoDocumentoId,
                     Nombre = item.Nombre
