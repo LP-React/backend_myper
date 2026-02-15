@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-using Microsoft.EntityFrameworkCore;
-using backend_myper.Entities;
-using backend_myper.Context;
+﻿using backend_myper.Context;
 using backend_myper.DTOs.Trabajador;
+using backend_myper.Entities;
+using backend_myper.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_myper.Controllers
 {
@@ -12,110 +12,47 @@ namespace backend_myper.Controllers
     [ApiController]
     public class TrabajadorController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        public TrabajadorController(AppDbContext context)
+        private readonly ITrabajadorService _service;
+
+        public TrabajadorController(ITrabajadorService service)
         {
-            _context = context;
+            _service = service;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<TrabajadorReadDTO>>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var listaDTO = new List<TrabajadorReadDTO>();
-
-            foreach (var item in await _context.Trabajador.Include(t => t.TipoDocumento).Where(t => t.Estado == true).ToListAsync())
-            {
-                listaDTO.Add(new TrabajadorReadDTO
-                {
-                    TrabajadorId = item.TrabajadorId,
-                    Nombres = item.Nombres,
-                    Apellidos = item.Apellidos,
-                    TipoDocumento = item.TipoDocumento.Nombre,
-                    NumeroDocumento = item.NumeroDocumento,
-                    FechaNacimiento = item.FechaNacimiento,
-                    Sexo = item.Sexo,
-                    FotoUrl = item.FotoUrl,
-                    Direccion = item.Direccion
-                });
-            };
-
-            return Ok(listaDTO);
+            return Ok(await _service.GetAllAsync());
         }
 
-        [HttpGet]
-        [Route("{id}")]
-        public async Task<ActionResult<TrabajadorReadDTO>> GetById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var item = await _context.Trabajador.Include(t => t.TipoDocumento).Where(t => t.TrabajadorId == id && t.Estado == true).FirstOrDefaultAsync();
-            if (item == null)
-                return NotFound();
-            var trabajadorReadDTO = new TrabajadorReadDTO
-            {
-                TrabajadorId = item.TrabajadorId,
-                Nombres = item.Nombres,
-                Apellidos = item.Apellidos,
-                TipoDocumento = item.TipoDocumento.Nombre,
-                NumeroDocumento = item.NumeroDocumento,
-                FechaNacimiento = item.FechaNacimiento,
-                Sexo = item.Sexo,
-                FotoUrl = item.FotoUrl,
-                Direccion = item.Direccion
-            };
-            return Ok(trabajadorReadDTO);
+            var result = await _service.GetByIdAsync(id);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<TrabajadorCreateDTO>> Post(TrabajadorCreateDTO trabajadorDTO)
+        public async Task<IActionResult> Post(TrabajadorCreateDTO dto)
         {
-            var trabajadorDB = new Trabajador
-            {
-                Nombres = trabajadorDTO.Nombres,
-                Apellidos = trabajadorDTO.Apellidos,
-                TipoDocumentoId = trabajadorDTO.TipoDocumentoId,
-                NumeroDocumento = trabajadorDTO.NumeroDocumento,
-                FechaNacimiento = trabajadorDTO.FechaNacimiento,
-                Sexo = trabajadorDTO.Sexo,
-                FotoUrl = trabajadorDTO.FotoUrl,
-                Direccion = trabajadorDTO.Direccion,
-                Estado = true
-                
-            };
-
-            await _context.Trabajador.AddAsync(trabajadorDB);
-            await _context.SaveChangesAsync();
+            await _service.CreateAsync(dto);
             return Ok("Trabajador registrado correctamente");
         }
 
-        [HttpPatch]
-        [Route("{id}")]
-        public async Task<ActionResult<TrabajadorUpdateDTO>> Edit(int id, TrabajadorUpdateDTO dto)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Edit(int id, TrabajadorUpdateDTO dto)
         {
-            var item = await _context.Trabajador.FindAsync(id);
-            if (item == null)
-                return NotFound();
-            if (dto.Nombres != null) item.Nombres = dto.Nombres;
-            if (dto.Apellidos != null) item.Apellidos = dto.Apellidos;
-            if (dto.TipoDocumentoId != null) item.TipoDocumentoId = dto.TipoDocumentoId.Value;
-            if (dto.NumeroDocumento != null) item.NumeroDocumento = dto.NumeroDocumento;
-            if (dto.FechaNacimiento != null) item.FechaNacimiento = dto.FechaNacimiento.Value;
-            if (dto.Sexo != null) item.Sexo = dto.Sexo;
-            if (dto.FotoUrl != null) item.FotoUrl = dto.FotoUrl;
-            if (dto.Direccion != null) item.Direccion = dto.Direccion;
-
-            await _context.SaveChangesAsync();
+            var updated = await _service.UpdateAsync(id, dto);
+            if (!updated) return NotFound();
             return Ok("Trabajador modificado");
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<ActionResult<String>> Delete(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            var item = await _context.Trabajador.Where(t => t.TrabajadorId == id).FirstOrDefaultAsync();
-            if (item == null)
-                return NotFound();
-            item.Estado = false;
-            _context.Trabajador.Update(item);
-            await _context.SaveChangesAsync();
+            var deleted = await _service.DeleteAsync(id);
+            if (!deleted) return NotFound();
             return Ok("Trabajador eliminado exitosamente");
         }
     }
