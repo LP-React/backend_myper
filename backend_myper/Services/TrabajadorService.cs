@@ -18,22 +18,22 @@ namespace backend_myper.Services
 
         public async Task<List<TrabajadorReadDTO>> GetAllAsync()
         {
-            return await _context.Trabajador
-                .Include(t => t.TipoDocumento)
-                .Where(t => t.Estado)
-                .Select(item => new TrabajadorReadDTO
-                {
-                    TrabajadorId = item.TrabajadorId,
-                    Nombres = item.Nombres,
-                    Apellidos = item.Apellidos,
-                    TipoDocumento = item.TipoDocumento.Nombre,
-                    NumeroDocumento = item.NumeroDocumento,
-                    FechaNacimiento = item.FechaNacimiento,
-                    Sexo = item.Sexo,
-                    FotoUrl = item.FotoUrl,
-                    Direccion = item.Direccion
-                })
+            var data = await _context.TrabajadoresSP
+                .FromSqlRaw("EXEC SP_ListarTrabajadores")
                 .ToListAsync();
+
+            return data.Select(item => new TrabajadorReadDTO
+            {
+                TrabajadorId = item.TrabajadorId,
+                Nombres = item.Nombres,
+                Apellidos = item.Apellidos,
+                TipoDocumento = item.TipoDocumento,
+                NumeroDocumento = item.NumeroDocumento,
+                FechaNacimiento = item.FechaNacimiento,
+                Sexo = item.Sexo,
+                FotoUrl = item.FotoUrl,
+                Direccion = item.Direccion
+            }).ToList();
         }
 
         public async Task<TrabajadorReadDTO?> GetByIdAsync(int id)
