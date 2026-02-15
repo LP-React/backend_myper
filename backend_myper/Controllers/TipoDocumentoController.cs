@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend_myper.Entities;
 using backend_myper.Context;
-using backend_myper.DTOs;
+using backend_myper.DTOs.TipoDocumento;
 
 namespace backend_myper.Controllers
 {
